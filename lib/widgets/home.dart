@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:privatily_app/widgets/translationsController.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:seo/seo.dart'; // SEO package
-
 import '../animations/animated_on_scrool.dart';
 import '../modules/cart/cart_logic.dart';
 import '../modules/cart/cart_view.dart';
@@ -52,13 +50,13 @@ class _HomeState extends State<Home> {
   bool showChatBox = false;
   bool showLoginForm = false;
   bool showSignupForm = false;
+
   //New Variables
   bool showRoleSelection = false;
   RxBool showStudentCourses = false.obs;
   bool isStudent = false; // Track if the user is a student or a client
   RxBool isLoggedIn = false.obs;
   String? selectedCourse;
-
   RxString selectedLang = 'en'.obs;
 
   //Controllers
@@ -71,7 +69,6 @@ class _HomeState extends State<Home> {
     super.initState();
     // Check initial login state
     isLoggedIn.value = FirebaseAuth.instance.currentUser != null;
-
     // Listen for authentication changes
     FirebaseAuth.instance.authStateChanges().listen((user) {
       isLoggedIn.value = user != null;
@@ -93,20 +90,19 @@ class _HomeState extends State<Home> {
   Widget fiveStars(double screenWidth) {
     final iconSize = screenWidth < 600 ? 18 : screenWidth < 1024 ? 22 : 26;
     return GestureDetector(
-      onTap: () => scrollToSection(_testimonialKey),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(children: List.generate(5, (_) => Icon(Icons.star, color: Colors.orange, size: double.parse(iconSize.toString())))),
-            const SizedBox(width: 12),
-            Text('rated_stars'.tr, style: TextStyle(fontSize: iconSize * 0.6, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
+        onTap: () => scrollToSection(_testimonialKey),
+        child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(children: List.generate(5, (_) => Icon(Icons.star, color: Colors.orange, size: double.parse(iconSize.toString())))),
+                const SizedBox(width: 12),
+                Text('rated_stars'.tr, style: TextStyle(fontSize: iconSize * 0.6, fontWeight: FontWeight.bold)),
+              ],
+            ),
+           ),
+       );}
 
   Widget chatPopup() {
     return Positioned(
@@ -119,7 +115,8 @@ class _HomeState extends State<Home> {
           child: ScaleTransition(
             scale: CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
             child: SlideTransition(
-              position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(anim),
+              position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
+                  .animate(anim),
               child: child,
             ),
           ),
@@ -138,7 +135,8 @@ class _HomeState extends State<Home> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 25)],
               image: DecorationImage(
-                image: NetworkImage('https://i.gifer.com/origin/0f/0f412581c9c78dec416072c7a42ef1b4.gif'), // Animated image URL
+                image: NetworkImage(
+                    'https://i.gifer.com/origin/0f/0f412581c9c78dec416072c7a42ef1b4.gif'), // Animated image URL
                 fit: BoxFit.cover,
               ),
             ),
@@ -159,7 +157,8 @@ class _HomeState extends State<Home> {
                         receiverId: logic.receiverIdForPopup.value,
                         receiverName: logic.receiverNameForPopup.value,
                       );
-                    } else if (showRoleSelection) { // Show role selection screen
+                    } else if (showRoleSelection) {
+                      // Show role selection screen
                       return _buildRoleSelection();
                     } else if (showLoginForm) {
                       return _buildLoginForm();
@@ -187,7 +186,6 @@ class _HomeState extends State<Home> {
                               });
                             },
                             child: Text('Create an account'),
-
                           ),
                         ],
                       );
@@ -208,7 +206,8 @@ class _HomeState extends State<Home> {
     onPressed: () async {
       _openChatPopup();
     },
-    child: Icon(showChatBox ? Icons.close : Icons.chat_bubble_outline, color: Colors.white),
+    child: Icon(showChatBox ? Icons.close : Icons.chat_bubble_outline,
+        color: Colors.white),
   );
 
   void _openChatPopup() {
@@ -218,11 +217,11 @@ class _HomeState extends State<Home> {
       showSignupForm = false;
       showRoleSelection = false;
     });
-
     // Check if the user is already logged in
     if (FirebaseAuth.instance.currentUser != null) {
       // User is already logged in, generate chatRoomId and show chat screen
-      String chatRoomId = logic.generateChatRoomId(FirebaseAuth.instance.currentUser!.uid, logic.fixedAdminId);
+      String chatRoomId = logic.generateChatRoomId(
+          FirebaseAuth.instance.currentUser!.uid, logic.fixedAdminId);
       logic.chatRoomIdForPopup.value = chatRoomId;
       logic.receiverIdForPopup.value = logic.fixedAdminId;
       logic.receiverNameForPopup.value = logic.adminName;
@@ -230,7 +229,8 @@ class _HomeState extends State<Home> {
     } else {
       // Show login/signup options
       setState(() {
-        showRoleSelection = showChatBox; // Show role selection on opening chatbox
+        showRoleSelection =
+            showChatBox; // Show role selection on opening chatbox
       });
     }
   }
@@ -268,8 +268,11 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildSignupForm() {
-    List<String> courses = ['Software Engineers', 'Digital Marketing', 'Spoken English '];
-
+    List<String> courses = [
+      'Software Engineers',
+      'Digital Marketing',
+      'Spoken English '
+    ];
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -327,7 +330,7 @@ class _HomeState extends State<Home> {
             obscureText: true,
           ),
           const Gap(12),
-          if(isStudent)
+          if (isStudent)
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 labelText: 'Select Course',
@@ -350,20 +353,35 @@ class _HomeState extends State<Home> {
                   selectedCourse = value;
                 });
               },
-              validator: (value) => value == null ? 'Please select a course' : null,
+              validator: (value) =>
+              isStudent && value == null ? 'Please select a course' : null,
             ),
           const Gap(12),
           ElevatedButton(
             onPressed: () async {
-              if (selectedCourse != null) {
-                await logic.createUserWithEmailAndPassword(emailController.text, passwordController.text,nameController.text, selectedCourse!, isStudent: isStudent);
+              if (isStudent && selectedCourse == null) {
+                Get.snackbar('Error', 'Please select a course');
+                return;
+              }
+
+              try {
+                await logic.createUserWithEmailAndPassword(
+                  emailController.text,
+                  passwordController.text,
+                  nameController.text,
+                  selectedCourse ?? '', // Pass empty string if no course selected
+                  isStudent: isStudent,
+                );
+
                 if (logic.auth.currentUser != null) {
                   setState(() {
                     showSignupForm = false;
                   });
                 }
-              } else {
-                Get.snackbar('Error', 'Please select a course');
+              } catch (e) {
+                Get.snackbar('Error', 'Signup failed: ${e.toString()}');
+                // Log the error for debugging
+                print("Signup Error: $e");
               }
             },
             style: ElevatedButton.styleFrom(
@@ -374,7 +392,8 @@ class _HomeState extends State<Home> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: const Text('Create Account', style: TextStyle(color: Colors.white)),
+            child: const Text('Create Account',
+                style: TextStyle(color: Colors.white)),
           ),
           const Gap(4),
           AnimatedSwitcher(
@@ -393,9 +412,11 @@ class _HomeState extends State<Home> {
                   showLoginForm = true;
                 });
               },
-              child: const Text('Already have an account? Login', style: TextStyle(color: Colors.deepPurple)),
+              child: const Text('Already have an account? Login',
+                  style: TextStyle(color: Colors.deepPurple)),
             ),
-          ),        ],
+          ),
+        ],
       ),
     );
   }
@@ -475,9 +496,11 @@ class _HomeState extends State<Home> {
                   showSignupForm = true;
                 });
               },
-              child: const Text('Create an account', style: TextStyle(color: Colors.deepPurple)),
+              child: const Text('Create an account',
+                  style: TextStyle(color: Colors.deepPurple)),
             ),
-          ),        ],
+          ),
+        ],
       ),
     );
   }
@@ -486,7 +509,10 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Seo.head(
       tags: [
-        MetaTag(name: 'description', content: 'LaunchCode: launch sooner and grow faster with our software marketplace.'),
+        MetaTag(
+            name: 'description',
+            content:
+            'LaunchCode: launch sooner and grow faster with our software marketplace.'),
         LinkTag(rel: 'canonical', href: 'https://launchcode.shop/'),
       ],
       child: Builder(
@@ -496,24 +522,26 @@ class _HomeState extends State<Home> {
             children: [
               Scaffold(
                 appBar: AppBar(
-                  title: Image.asset('assets/images/logo_white.png', height: 120),
+                  title: Image.asset('assets/images/logo_white.png',
+                      height: 120),
                   backgroundColor: Colors.white,
                   actions: [
-
                     if (ResponsiveBreakpoints.of(context).largerThan(MOBILE))
-                      TextButton(onPressed: () => scrollToSection(_whyUsKey), child: Text('Why Us?'.tr)),
-                    TextButton(onPressed: () => scrollToSection(_contactUsKey), child: Text('Contact Us!'.tr)),
+                      TextButton(
+                          onPressed: () => scrollToSection(_whyUsKey),
+                          child: Text('Why Us?'.tr)),
+                    TextButton(
+                        onPressed: () => scrollToSection(_contactUsKey),
+                        child: Text('Contact Us!'.tr)),
                     if (ResponsiveBreakpoints.of(context).largerThan(MOBILE))
-                      TextButton(onPressed: () => scrollToSection(_faqKey), child: Text('FAQ'.tr)),
+                      TextButton(
+                          onPressed: () => scrollToSection(_faqKey),
+                          child: Text('FAQ'.tr)),
                     FirebaseAuth.instance.currentUser == null
                         ? TextButton(
-                      onPressed: _openChatPopup,
-                      child: Text('Login'.tr),
-                    )
+                        onPressed: _openChatPopup, child: Text('Login'.tr))
                         : TextButton(
-                      onPressed: logic.logOut,
-                      child: Text('Logout'.tr),
-                    ),
+                        onPressed: logic.logOut, child: Text('Logout'.tr)),
                     const Gap(10),
                     Obx(() {
                       final count = Get.find<CartLogic>().itemCount;
@@ -535,10 +563,14 @@ class _HomeState extends State<Home> {
                         underline: const SizedBox.shrink(),
                         isExpanded: true,
                         items: const [
-                          DropdownMenuItem(value: 'en', child: Text('English')),
-                          DropdownMenuItem(value: 'fr', child: Text('Français')),
-                          DropdownMenuItem(value: 'es', child: Text('Español')),
-                          DropdownMenuItem(value: 'ar', child: Text('عربي')),
+                          DropdownMenuItem(
+                              value: 'en', child: Text('English')),
+                          DropdownMenuItem(
+                              value: 'fr', child: Text('Français')),
+                          DropdownMenuItem(
+                              value: 'es', child: Text('Español')),
+                          DropdownMenuItem(
+                              value: 'ar', child: Text('عربي')),
                         ],
                         onChanged: (val) {
                           selectedLang.value = val!;
@@ -604,16 +636,19 @@ class _HomeState extends State<Home> {
                         child: const FeaturedProductsSection(),
                       ),
                       const AnimatedOnScroll(child: HomeStatsSection()),
-                      AnimatedOnScroll(child: WhyLaunchCodeSection(key: _whyUsKey)),
+                      AnimatedOnScroll(
+                          child: WhyLaunchCodeSection(key: _whyUsKey)),
                       const AnimatedOnScroll(child: PremiumBonusSection()),
                       const AnimatedOnScroll(child: HowMuchTimeSection()),
                       const AnimatedOnScroll(child: WhyLaunchCodeSection2()),
                       const AnimatedOnScroll(child: TransparentPricingSection()),
-                      AnimatedOnScroll(child: TestimonialSection(key: _testimonialKey)),
+                      AnimatedOnScroll(
+                          child: TestimonialSection(key: _testimonialKey)),
                       const AnimatedOnScroll(child: OurMissionSection()),
                       AnimatedOnScroll(child: FaqSection(key: _faqKey)),
                       const AnimatedOnScroll(child: LaunchAnywhereSection()),
-                      AnimatedOnScroll(child: ContactUsSection(key: _contactUsKey)),
+                      AnimatedOnScroll(
+                          child: ContactUsSection(key: _contactUsKey)),
                       const AnimatedOnScroll(child: FooterSection()),
                     ],
                   ),
@@ -648,16 +683,22 @@ class _HomeState extends State<Home> {
             runSpacing: 4,
             alignment: WrapAlignment.center,
             children: [
-              const Icon(Icons.rocket_launch, color: Colors.deepPurple, size: 28),
-              Text('launch_sooner'.tr, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              const Icon(Icons.rocket_launch,
+                  color: Colors.deepPurple, size: 28),
+              Text('launch_sooner'.tr,
+                  style: const TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.bold)),
               const Icon(Icons.trending_up, color: Colors.green, size: 28),
-              Text('grow_faster'.tr, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              Text('grow_faster'.tr,
+                  style: const TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.bold)),
             ],
           ),
           const Gap(6),
           Text('discover_software'.tr,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: width < 600 ? 16 : 18, color: Colors.black54)),
+              style:
+              TextStyle(fontSize: width < 600 ? 16 : 18, color: Colors.black54)),
           const Gap(16),
           Wrap(
             spacing: 16,
@@ -668,13 +709,17 @@ class _HomeState extends State<Home> {
                 onPressed: () => scrollToSection(_featuredKey),
                 icon: const Icon(Icons.explore),
                 label: Text('explore_products'.tr),
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12)),
               ),
               OutlinedButton.icon(
                 onPressed: () => scrollToSection(_featuredKey),
                 icon: const Icon(Icons.code),
                 label: Text('browse_categories'.tr),
-                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
+                style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12)),
               ),
             ],
           ),

@@ -39,8 +39,6 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
   final ChattingPageLogic logic = Get.put(ChattingPageLogic());
   final TextEditingController _messageController = TextEditingController();
   final RxBool showCommonQuestions = true.obs;
-  String? guestName;
-  bool hasAskedName = false;
 
   Timer? _typingTimer;
   final _auth = FirebaseAuth.instance;
@@ -48,10 +46,8 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
 
   @override
   void initState() {
-
     super.initState();
-     globalChatRoomId = widget.chatRoomId;
-    _loadGuestName();
+    globalChatRoomId = widget.chatRoomId;
     WidgetsBinding.instance.addObserver(this);
     setUserOnline(globalChatRoomId);
   }
@@ -65,57 +61,8 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
     super.dispose();
   }
 
-
-
-
-
-  Future<void> _loadGuestName() async {
-    final prefs = await SharedPreferences.getInstance();
-    guestName = prefs.getString('guest_name');
-  }
-
   Future<void> sendWithNameCheck(String message) async {
-    if (guestName == null) await _loadGuestName();
-
-    if (guestName == null && !hasAskedName) {
-      hasAskedName = true;
-      final name = await showDialog<String>(
-        context: context,
-        builder: (context) {
-          final controller = TextEditingController();
-          return AlertDialog(
-            title: const Text("Enter your name"),
-            content: TextField(
-              controller: controller,
-              decoration: const InputDecoration(hintText: "Your name"),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel")),
-              TextButton(
-                  onPressed: () =>
-                      Navigator.pop(context, controller.text.trim()),
-                  child: const Text("Continue")),
-            ],
-          );
-        },
-      );
-
-      if (name == null || name.isEmpty) {
-        hasAskedName = false;
-        return;
-      }
-
-      guestName = name;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('guest_name', guestName!);
-      await _firestore //CHANGED TO _firestore
-          .collection('ChatsRoomId')
-          .doc(widget.chatRoomId)
-          .set({'guestName': guestName}, SetOptions(merge: true));
-    }
-
+    // Name prompt removed – directly sending the message
     await logic.sendMessage(widget.chatRoomId, widget.receiverId, message);
   }
 
@@ -127,7 +74,6 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: AdminStatus(adminUserId: widget.receiverId),
@@ -161,8 +107,7 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
-                    final isMe =
-                        msg.senderId == logic.myFbAuth.currentUser?.uid;
+                    final isMe = msg.senderId == logic.myFbAuth.currentUser?.uid;
                     final current = msg.timestamp ?? DateTime.now();
 
                     final next = index + 1 < messages.length
@@ -186,7 +131,6 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
             ),
           ),
           MsgAnimIcon(guestUserId: widget.receiverId),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: CommonQuestions(
@@ -204,7 +148,7 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
               final isTyping = text.trim().isNotEmpty;
               print("onChanged called. text: '$text', isTyping: $isTyping");
 
-             logic.setTypingStatus(isTyping);
+              logic.setTypingStatus(isTyping);
 
               if (_typingTimer != null && _typingTimer!.isActive) {
                 print("Timer cancelled");
@@ -214,18 +158,15 @@ class _ChattingPageState extends State<ChattingPage> with WidgetsBindingObserver
               if (isTyping) {
                 _typingTimer = Timer(const Duration(seconds: 1), () {
                   print("Timer expired, setting isTyping to false");
-                 logic.setTypingStatus(false);
+                  logic.setTypingStatus(false);
                 });
               } else {
                 print("Text field is empty");
               }
             },
           ),
-
         ],
       ),
     );
   }
 }
-
-
